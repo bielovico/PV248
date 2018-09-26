@@ -5,6 +5,17 @@ re_composer = re.compile('Composer: (.*)')
 re_century = re.compile('Composition Year: ([0-9 .]*)(.* century)?')
 re_key = re.compile('Key: (.*)')
 pattern_date = r' \([0-9/+-]*\)'
+century_suffix = dict(zip([str(i) for i in range(10,22)],['th' for _ in range(10,22)]))
+century_suffix['21'] = 'st'
+
+
+def safe_add(d, key):
+    c = d.get(key)
+    if c is None:
+        d[key] = 1
+    else:
+        d[key] += 1
+    return
 
 def parse_composer(line):
     composers = re_composer.match(line)
@@ -15,11 +26,7 @@ def parse_composer(line):
             composer = re.sub(pattern_date, '', composer)
             composer = composer.strip()
             if composer != '':
-                c = pieces_by_composer.get(composer)
-                if c is None:
-                    pieces_by_composer[composer] = 1
-                else:
-                    pieces_by_composer[composer] += 1
+                safe_add(pieces_by_composer, composer)
     return
 
 def print_composers():
@@ -37,19 +44,16 @@ def parse_century(line):
         year = year.strip()
         if year != '':
             if len(year) == 2:
-                c = pieces_by_century.get(year)
-                if c is None:
-                    pieces_by_century[year] = 1
-                else:
-                    pieces_by_century[year] += 1
+                safe_add(pieces_by_century, year)
+            elif year[-2:] == '00':
+                safe_add(pieces_by_century, year[:2])
             else:
-                pass
-            print(year)
+                safe_add(pieces_by_century, str(int(year[:2])+1))
     return
 
 def print_centuries():
     for century, pieces in pieces_by_century.items():
-        print('%s: %d' % (century, pieces))
+        print('%s%s century: %d' % (century, century_suffix[century], pieces))
     return
 
 def parse_key(line):
