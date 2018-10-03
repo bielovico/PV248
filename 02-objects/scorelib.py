@@ -5,7 +5,7 @@ re_print_id = re.compile('Print Number: ([0-9]*)')
 re_edition = re.compile('Edition: (.*)')
 re_editor = re.compile('Editor: (.*)')
 re_partiture = re.compile('Partiture: (.*)')
-re_range = re.compile('.*?([a-zA-Z0-9]*-{1,2}[a-zA-Z0-9]*).*')
+re_date_range = re.compile('.*?([a-zA-Z0-9]*-{1,2}[a-zA-Z0-9]*).*')
 re_dates = re.compile(r'.*?(\(\*?([0-9]{4})?-{0,2}\+?([0-9]{4})?\)).*')
 
 
@@ -60,13 +60,13 @@ class Composition:
     
 
 class Voice:
-    def __init__(self, name, range = None):
+    def __init__(self, name, date_range = None):
         self.name = name
-        self.range = range
+        self.date_range = date_range
     def __str__(self):
         out = ''
-        if self.range is not None:
-            out += self.range + ', '
+        if self.date_range is not None:
+            out += self.date_range + ', '
         out += self.name
         return out
 
@@ -126,28 +126,28 @@ def parse_print(p):
     edition_name = ps[7].split(':')[1]
     
     editors = ps[8].split(':')[1]
-    edit_authors = []
-    dates = re_dates.match(editors)
-    if dates is not None:
-        born = dates.group(2)
-        died = dates.group(3)
-        name = editors[:dates.start(1)] + editors[dates.end(1):]
-        name = name.strip()
-        person = Person(name, born, died)
-        edit_authors.append(person)
+    if ',' not in editors:
+        edit_authors = [Person(editors)]
     else:
-        edit_authors.append(Person(editors))
+        words = editors.split(',')
+        if sum([len(a.split()) for a in words]) == len(words):
+            # only one word around commas -> commas separate authors and names
+            edit_authors = [','.join(words[i:i+2]) for i in range(int(len(words)/2))]
+            edit_authors = [Person(a) for a in edit_authors]
+        else:
+            # commas separate authors only
+            edit_authors = [Person(a) for a in words]
 
     voices = []
     current_line = 9
     for line in ps[9:-1]:
         if line[0] == 'V':
             v = line.split(':')[1]
-            range = re_range.match(v)
-            if range is not None:
-                range = range.group(1)
-                v = re.sub(range + ',? ?', '', v)
-                voice = Voice(v, range)
+            date_range = re_date_range.match(v)
+            if date_range is not None:
+                date_range = date_range.group(1)
+                v = re.sub(date_range + ',? ?', '', v)
+                voice = Voice(v, date_range)
                 voices.append(voice)
             else:
                 voices.append(Voice(v))
