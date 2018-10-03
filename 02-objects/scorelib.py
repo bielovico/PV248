@@ -5,33 +5,29 @@ re_print_id = re.compile('Print Number: ([0-9]*)')
 re_edition = re.compile('Edition: (.*)')
 re_editor = re.compile('Editor: (.*)')
 re_partiture = re.compile('Partiture: (.*)')
-re_range = re.compile('([a-zA-Z]*--[a-zA-Z]*)')
-re_dates = re.compile('(\(\*?([0-9]{4})?-{0,2}\+?([0-9]{4})?\))')
-
+re_range = re.compile('.*?([a-zA-Z0-9]*-{1,2}[a-zA-Z0-9]*).*')
+re_dates = re.compile(r'.*?(\(\*?([0-9]{4})?-{0,2}\+?([0-9]{4})?\)).*')
 
 
 class Print:
-    print_id = None
-    edition = None
-    partiture = None
-    def __init__(self, edition, print_id, partiture):
+    def __init__(self, print_id, edition = None, partiture = None):
         self.edition = edition
         self.print_id = print_id
         self.partiture = partiture
     def format(self):
         print('Print Number:', self.print_id)
-        print('Composer:', '; '.join([str(p) for p in self.edition.composition.authors]))
-        print('Title:', self.edition.composition.name)
-        print('Genre:', self.edition.composition.genre)
-        print('Key:', self.edition.composition.key)
-        print('Composition Year:', self.edition.composition.year)
-        # print('Publication Year:')
+        print('Composer:', '; '.join([str(p) for p in self.composition().authors]))
+        print('Title:', self.composition().name)
+        print('Genre:', self.composition().genre)
+        print('Key:', self.composition().key)
+        print('Composition Year:', self.composition().year)
+        print('Publication Year: ')
         print('Edition:', self.edition.name)
         print('Editor:', ''.join([str(p) for p in self.edition.authors]))
-        for i,voice in enumerate(self.edition.composition.voices):
-            print('Voice ', str(i), ': ', voice, sep='')
+        for i,voice in enumerate(self.composition().voices):
+            print('Voice ', str(i+1), ': ', str(voice), sep='')
         print('Partiture:', 'yes' if self.partiture else 'no')
-        print('Incipit:', self.edition.composition.incipit)
+        print('Incipit:', self.composition().incipit)
     def composition(self):
         return self.edition.composition
 
@@ -64,18 +60,22 @@ class Composition:
     
 
 class Voice:
-    name = None
-    range = None
-    def __init__(self, name, range):
+    def __init__(self, name, range = None):
         self.name = name
         self.range = range
+    def __str__(self):
+        out = ''
+        if self.range is not None:
+            out += self.range + ', '
+        out += self.name
+        return out
 
 class Person:
     def __init__(self, name="", born=None, died=None):
         self.name = name
         self.born = born
         self.died = died
-        self.dates_known = born is not None and died is not None
+        self.dates_known = born is not None or died is not None
     def __str__(self):
         out = self.name
         if self.dates_known:
@@ -92,7 +92,7 @@ def parse_print(p):
     p = p.strip()
     ps = p.split('\n')
     
-    print_id = ps[0].split(':')[1]
+    print_id = int(ps[0].split(':')[1])
     
     composers = ps[1].split(':')[1]
     composers = composers.split(';')
@@ -102,11 +102,12 @@ def parse_print(p):
         if dates is not None:
             born = dates.group(2)
             died = dates.group(3)
-            name = re.sub(dates.group(1), '', composer)
+            name = composer[:dates.start(1)] + composer[dates.end(1):]
+            name = name.strip()
             person = Person(name, born, died)
             authors.append(person)
         else:
-            authors.append(Person(composer))
+            authors.append(Person(composer.strip()))
 
     title = ps[2].split(':')[1]
 
@@ -116,8 +117,11 @@ def parse_print(p):
     key = ps[4].split(':')[1]
     
     c_year = ps[5].split(':')[1]
+    c_year = c_year.strip()
+    if re.match('^[0-9]{4}$', c_year) is not None:
+        c_year = int(c_year)
     
-    p_year = ps[6].split(':')[1]
+    # p_year = ps[6].split(':')[1]
     
     edition_name = ps[7].split(':')[1]
     
@@ -127,13 +131,15 @@ def parse_print(p):
     if dates is not None:
         born = dates.group(2)
         died = dates.group(3)
-        name = re.sub(dates.group(1), '', editors)
+        name = editors[:dates.start(1)] + editors[dates.end(1):]
+        name = name.strip()
         person = Person(name, born, died)
         edit_authors.append(person)
     else:
         edit_authors.append(Person(editors))
 
     partiture = ps[-2].split(':')[1]
+    partiture = partiture.strip()
     if partiture[:2] == 'no':
         partiture = False
     elif partiture[:3] == 'yes':
@@ -153,10 +159,12 @@ def parse_print(p):
                 v = re.sub(range + ',? ?', '', v)
                 voice = Voice(v, range)
                 voices.append(voice)
+            else:
+                voices.append(Voice(v))
     
     composition = Composition(title, incipit, key, genres, c_year, voices, authors)
     edition = Edition(composition, edit_authors, edition_name)
-    pr = Print(edition, print_id, partiture)
+    pr = Print(print_id, edition, partiture)
     return pr
 
     
@@ -173,4 +181,4 @@ def load(filename):
     for p in prints:
         pp = parse_print(p)
         pps.append(pp)
-    return pps
+    return sorted(pps, key=lambda p: p.print_id)
