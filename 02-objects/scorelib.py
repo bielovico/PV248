@@ -138,18 +138,8 @@ def parse_print(p):
     else:
         edit_authors.append(Person(editors))
 
-    partiture = ps[-2].split(':')[1]
-    partiture = partiture.strip()
-    if partiture[:2] == 'no':
-        partiture = False
-    elif partiture[:3] == 'yes':
-        partiture = True
-    else:
-        partiture = None
-    
-    incipit = ps[-1].split(':')[1]
-
     voices = []
+    current_line = 9
     for line in ps[9:-1]:
         if line[0] == 'V':
             v = line.split(':')[1]
@@ -161,7 +151,20 @@ def parse_print(p):
                 voices.append(voice)
             else:
                 voices.append(Voice(v))
-    
+            current_line += 1
+        else:
+            break
+
+    partiture_line = current_line
+    partiture = ps[partiture_line].split(':')[1]
+    partiture = partiture.strip()
+    if len(partiture) >= 3 and partiture[:3] == 'yes':
+        partiture = True
+    else:
+        partiture = False
+
+    incipit = ps[partiture_line+1].split(':')[1]
+
     composition = Composition(title, incipit, key, genres, c_year, voices, authors)
     edition = Edition(composition, edit_authors, edition_name)
     pr = Print(print_id, edition, partiture)
