@@ -106,7 +106,7 @@ def parse_print(p):
             name = name.strip()
             person = Person(name, born, died)
             authors.append(person)
-        else:
+        elif composer.strip() != '':
             authors.append(Person(composer.strip()))
 
     title = ps[2].split(':')[1]
@@ -123,20 +123,24 @@ def parse_print(p):
     
     # p_year = ps[6].split(':')[1]
     
-    edition_name = ps[7].split(':')[1]
+    edition_name = ps[7].split(':')[1].strip()
+    if edition_name == '':
+        edition_name = None
     
     editors = ps[8].split(':')[1]
-    if ',' not in editors:
-        edit_authors = [Person(editors)]
-    else:
-        words = editors.split(',')
-        if sum([len(a.split()) for a in words]) == len(words):
-            # only one word around commas -> commas separate authors and names
-            edit_authors = [','.join(words[i:i+2]) for i in range(int(len(words)/2))]
-            edit_authors = [Person(a) for a in edit_authors]
+    edit_authors = []
+    if (editors.strip() != ''):
+        if (',' not in editors):
+            edit_authors = [Person(editors.strip())]
         else:
-            # commas separate authors only
-            edit_authors = [Person(a) for a in words]
+            words = editors.split(',')
+            if sum([len(a.split()) for a in words]) == len(words):
+                # only one word around commas -> commas separate authors and names
+                edit_authors = [','.join(words[i:i+2]) for i in range(int(len(words)/2))]
+                edit_authors = [Person(a.strip()) for a in edit_authors]
+            else:
+                # commas separate authors only
+                edit_authors = [Person(a.strip()) for a in words]
 
     voices = []
     current_line = 9
@@ -147,10 +151,10 @@ def parse_print(p):
             if date_range is not None:
                 date_range = date_range.group(1)
                 v = re.sub(date_range + ',? ?', '', v)
-                voice = Voice(v, date_range)
+                voice = Voice(v.strip(), date_range)
                 voices.append(voice)
-            else:
-                voices.append(Voice(v))
+            elif v.strip() != '':
+                voices.append(Voice(v.strip()))
             current_line += 1
         else:
             break
