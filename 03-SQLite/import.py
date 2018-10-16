@@ -16,12 +16,14 @@ with open(schema_file, 'r') as f:
 conn.commit()
 
 c.execute('CREATE TABLE person_temp (born integer, died integer, name varchar not null)')
+c.execute('CREATE TABLE score_temp (name varchar, genre varchar, key varchar, incipit varchar, year integer)')
 
 for p in prints:
     for a in p.composition().authors:
         c.execute('INSERT INTO person_temp VALUES (?, ?, ?)', (a.born, a.died, a.name))
     for e in p.edition.authors:
         c.execute('INSERT INTO person_temp VALUES (?, ?, ?)', (a.born, a.died, a.name))
+    c.execute('INSERT INTO score_temp VALUES (?, ?, ?, ?, ?)', (p.composition().name, p.composition().genre, p.composition().key, p.composition().year))
 
 c.execute("INSERT INTO person(born, died, name) SELECT MIN(born), MAX(died), name FROM person_temp WHERE name != '' GROUP BY name")
 c.execute('DROP TABLE person_temp')
