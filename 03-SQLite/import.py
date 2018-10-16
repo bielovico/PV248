@@ -21,6 +21,7 @@ c.execute('CREATE TABLE score_temp (fid integer, name varchar, genre varchar, ke
 c.execute('CREATE TABLE score_full (id integer primary key not null, name varchar, genre varchar, key varchar, incipit varchar, year integer, composers varchar, voices varchar)')
 c.execute('CREATE TABLE edition_temp (score integer, name varchar, year integer, editors varchar)')
 c.execute('CREATE TABLE edition_full (id integer primary key not null, score integer, name varchar, year integer, editors varchar)')
+c.execute('CREATE TABLE print_temp (id integer, partiture char(1), edition integer, temp_id integer)')
 
 
 
@@ -33,7 +34,7 @@ for i,p in enumerate(prints):
     # for i, v in enumerate(p.composition().voices):
     #     c.execute('INSERT INTO voice_temp VALUES (?, ?, ?, ?)', (i, c.lastrowid, v.date_range, v.name))
     c.execute('INSERT INTO edition_temp VALUES (?, ?, ?, ?)', (i, p.edition.name, None, json.dumps([a.name for a in p.edition.authors], ensure_ascii=False)))
-    c.execute('INSERT INTO print VALUES (?, ?, ?)', (p.print_id, '{}'.format('Y' if p.partiture else 'N'), i))    
+    c.execute('INSERT INTO print_temp VALUES (?, ?, ?, ?)', (p.print_id, '{}'.format('Y' if p.partiture else 'N'), None, i))    
 
 c.execute("INSERT INTO person(born, died, name) SELECT MIN(born), MAX(died), name FROM person_temp WHERE name != '' GROUP BY name")
 c.execute('DROP TABLE person_temp')
@@ -43,6 +44,13 @@ for edition in editions:
     score = c.execute("SELECT name, genre, incipit, key, year, composers, voices FROM score_temp WHERE fid = ?", (edition[0],)).fetchone()
     score_id = c.execute("SELECT id FROM score_full WHERE name = ? and genre = ? and incipit = ? and key=? and year=? and composers=? and voices=?", (score[0], score[1], score[2], score[3], score[4], score[5], score[6])).fetchone()[0]
     c.execute("INSERT INTO edition_full(score, name, year, editors) VALUES (?, ?, ?, ?)", (score_id, edition[1], edition[2], edition[3]))
+
+editions = c.execute("SELECT score FROM edition_temp WHERE not(name isnull and year isnull and editors=='[]')").fetchall()
+for i,e in enumerate(editions):
+    e_id = i
+    p_id = e[0]
+    c.execute("UPDATE print_temp SET edition = ? WHERE temp_id = ?", (e_id, p_id))
+c.execute("INSERT INTO print SELECT id, partiture, edition FROM print_temp")
 
 voice_list = c.execute('SELECT id, voices FROM score_full').fetchall()
 for row in voice_list:
@@ -70,6 +78,7 @@ c.execute('DROP TABLE score_temp')
 c.execute('DROP TABLE score_full')
 c.execute('DROP TABLE edition_temp')
 c.execute('DROP TABLE edition_full')
+c.execute('DROP TABLE print_temp')
 
 conn.commit()
 conn.close()
