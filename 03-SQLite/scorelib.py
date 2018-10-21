@@ -109,12 +109,12 @@ def parse_print(p):
         elif composer.strip() != '':
             authors.append(Person(composer.strip()))
 
-    title = ps[2].split(':')[1]
+    title = ps[2].split(':')[1].strip()
 
-    genres = ps[3].split(':')[1]
+    genres = ps[3].split(':')[1].strip()
     # genres = genres.split(',')
     
-    key = ps[4].split(':')[1]
+    key = ps[4].split(':')[1].strip()
     
     c_year = ps[5].split(':')[1]
     c_year = c_year.strip()
@@ -167,7 +167,7 @@ def parse_print(p):
     else:
         partiture = False
 
-    incipit = ps[partiture_line+1].split(':')[1]
+    incipit = ps[partiture_line+1].split(':')[1].strip()
 
     composition = Composition(title, incipit, key, genres, c_year, voices, authors)
     edition = Edition(composition, edit_authors, edition_name)

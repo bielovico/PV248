@@ -105,3 +105,4 @@ venv.bak/
 
 # my additional files
 .vscode/launch.json
+03-SQLite/.vscode/settings.json

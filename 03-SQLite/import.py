@@ -47,7 +47,7 @@ for edition in editions:
 
 editions = c.execute("SELECT score FROM edition_temp WHERE not(name isnull and year isnull and editors=='[]')").fetchall()
 for i,e in enumerate(editions):
-    e_id = i
+    e_id = i+1
     p_id = e[0]
     c.execute("UPDATE print_temp SET edition = ? WHERE temp_id = ?", (e_id, p_id))
 c.execute("INSERT INTO print SELECT id, partiture, edition FROM print_temp")
