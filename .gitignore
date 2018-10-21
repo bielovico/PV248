@@ -105,4 +105,6 @@ venv.bak/
 
 # my additional files
 .vscode/launch.json
-03-SQLite/.vscode/settings.json
+03-SQLite/scorelib.dat
+03-SQLite/.vscode
+04-JSON/scorelib.dat
