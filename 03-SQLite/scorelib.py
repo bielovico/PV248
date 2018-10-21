@@ -35,10 +35,12 @@ class Edition:
     composition = None
     authors = []
     name = None
-    def __init__(self, composition, authors, name):
+    year = None
+    def __init__(self, composition, authors, name, year):
         self.composition = composition
         self.authors = authors
         self.name = name
+        self.year = year
 
 
 class Composition:
@@ -120,8 +122,15 @@ def parse_print(p):
     c_year = c_year.strip()
     if re.match('^[0-9]{4}$', c_year) is not None:
         c_year = int(c_year)
+    else:
+        c_year = None
     
-    # p_year = ps[6].split(':')[1]
+    p_year = ps[6].split(':')[1].strip()
+    if re.match('^[0-9]{4}$', p_year) is not None:
+        p_year = int(p_year)
+    else:
+        p_year = None
+
     
     edition_name = ps[7].split(':')[1].strip()
     if edition_name == '':
@@ -170,7 +179,7 @@ def parse_print(p):
     incipit = ps[partiture_line+1].split(':')[1].strip()
 
     composition = Composition(title, incipit, key, genres, c_year, voices, authors)
-    edition = Edition(composition, edit_authors, edition_name)
+    edition = Edition(composition, edit_authors, edition_name, p_year)
     pr = Print(print_id, edition, partiture)
     return pr
 
