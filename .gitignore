@@ -108,3 +108,4 @@ venv.bak/
 03-SQLite/scorelib.dat
 03-SQLite/.vscode
 04-JSON/scorelib.dat
+05-linalg/input.txt
