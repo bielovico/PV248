@@ -22,8 +22,8 @@ def get_window(data):
             window = []
             counter = 0
 
-lowest = 24000
-highest = 0
+lowest = np.inf
+highest = -np.inf
 for window in get_window(data):
     amplitudes = np.fft.rfft(window)
     amplitudes = np.abs(amplitudes)
@@ -31,4 +31,7 @@ for window in get_window(data):
     if peaks.min() < lowest:    lowest = peaks.min()
     if peaks.max() > highest:   highest = peaks.max()
 
-print('low = {}, high = {}'.format(lowest, highest))
+if np.isfinite(lowest) and np.isfinite(highest):
+    print('low = {}, high = {}'.format(lowest, highest))
+else:
+    print('no peaks')
