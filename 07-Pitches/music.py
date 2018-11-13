@@ -164,6 +164,7 @@ for window in get_window(data, stereo):
         print_segment(segment_start, position, current_pitches)
         segment_start = None
         current_pitches = []
+        inSegment = False
     else:
         pass
     # c += 1
