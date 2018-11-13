@@ -27,6 +27,8 @@ nwindows = nframes // slide_frames
 nwindows -= window_seconds // window_slide
 
 def closest_pitch(frequency):
+    if frequency == 0:
+        return ''
     steps = 12*log2(frequency/c0)
     octave = round(steps) // 12
     note = round(steps) % 12
@@ -71,6 +73,8 @@ def get_window(data, stereo=False):
                 counter -= slide_frames
 
 def get_pitches(window):
+    if sum(window) == 0:
+        return []
     amplitudes = np.fft.rfft(window)
     amplitudes = np.abs(amplitudes)
     over_avg = amplitudes >= 20*np.average(amplitudes)
