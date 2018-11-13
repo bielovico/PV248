@@ -80,6 +80,8 @@ def get_pitches(window):
     n = min(len(peaks), noutputs)
     output = []
     for _ in range(n):
+        if len(peak_amps) == 0:
+            break
         peak, amp = peak_amps[0]
         ps, center = find_cluster(peak, over_avg)
         if len(peak_amps) < 2:
