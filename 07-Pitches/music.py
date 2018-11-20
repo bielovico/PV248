@@ -88,7 +88,7 @@ def get_pitches(window):
             break
         peak, amp = peak_amps[0]
         ps, center = find_cluster(peak, over_avg)
-        if len(peak_amps) < 2:
+        if len(peak_amps) <= 1:
             output.append(peak)
             break
         npeak, namp = peak_amps[1]
@@ -99,7 +99,7 @@ def get_pitches(window):
             if abs(center-npeak) < abs(center-peak):
                 peak = npeak
             i += 1
-            if len(peak_amps) < i+1:
+            if len(peak_amps) < i:
                 break
             npeak, namp = peak_amps[i]
         output.append(peak)
@@ -117,7 +117,7 @@ def find_cluster(peak, peaks):
     while found:
         found = False
         i += 1
-        if peak-i > 0:
+        if peak-i >= 0:
             left = peaks[peak-i]
         else:
             left = False
