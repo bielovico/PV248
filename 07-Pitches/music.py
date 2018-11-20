@@ -9,10 +9,10 @@ window_slide = 0.1  # in seconds
 
 noutputs = 3
 
-standard_pitch = sys.argv[1]
+standard_pitch = int(sys.argv[1])
 filename = sys.argv[2]
 
-c0 = int(standard_pitch)*(2**(-9/12 - 4))
+c0 = standard_pitch*(2**(-9/12 - 4))
 
 pitches_names = ["c", "cis", "d", "es", "e", "f", "fis", "g", "gis", "a", "bes", "b"]
 
@@ -73,7 +73,7 @@ def get_window(data, stereo=False):
                 counter -= slide_frames
 
 def get_pitches(window):
-    if sum(window) == 0:
+    if sum([abs(x) for x in window]) == 0:
         return []
     amplitudes = np.fft.rfft(window)
     amplitudes = np.abs(amplitudes)
@@ -136,7 +136,7 @@ def find_cluster(peak, peaks):
     return ps, center
 
 def print_segment(start, end, pitches):
-    out = '{:04.2f}-{:04.2f}'.format(start, end)
+    out = '{:03.1f}-{:03.1f}'.format(start, end)
     for p in pitches:
         out += ' ' + p 
     print(out)
@@ -171,4 +171,3 @@ for window in get_window(data, stereo):
     position += window_slide
 if inSegment:
     print_segment(segment_start, position, current_pitches)
-
