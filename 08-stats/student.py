@@ -6,7 +6,7 @@ import json
 filename = sys.argv[1]
 sid = sys.argv[2]
 
-semester_start = np.datetime64('2018-09-17')
+semester_start = np.datetime64('2018-09-16')
 
 def main():
     points = pd.read_csv(filename, index_col=0)
