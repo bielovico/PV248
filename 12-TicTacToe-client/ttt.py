@@ -1,15 +1,15 @@
 import sys
-
-port = int(sys.argv[1])
-
 import http.server
 from urllib.parse import urlparse, parse_qs
 import json
 import asyncio
 
 class TTTGame():
-    def __init__(self, id, board_size, name):
+    player_characters = {0: '_', 1: 'x', 2: 'o'}
+
+    def __init__(self, id, name, board_size=3):
         self.id = id
+        self.board_size = board_size
         self.board = [[0 for _ in range(board_size)] for _ in range(board_size)]
         self.board_T = [[0 for _ in range(board_size)] for _ in range(board_size)]
         self.name = name
@@ -62,13 +62,20 @@ class TTTGame():
             self.winner = 0
         return self.completed
 
+    def draw_board(self):
+        for row in self.board:
+            print('|', end='')
+            for c in row:
+                print(self.player_characters[c] + '|', sep='', end='')
+            print()
+
 class TTTServer(http.server.HTTPServer):
     games = {}
     free_id = 0
     board_size = 3
 
     def start_game(self, name):
-        g = TTTGame(self.free_id, self.board_size, name)
+        g = TTTGame(self.free_id, name, self.board_size,)
         self.games[self.free_id] = g
         self.free_id += 1
         return g.get_id()
@@ -177,6 +184,7 @@ def run(server_class=http.server.HTTPServer, handler_class=http.server.BaseHTTPR
     httpd.serve_forever()
 
 def main():
+    port = int(sys.argv[1])
     run(server_class=TTTServer, handler_class=TTTHandler)
 
 if __name__ == '__main__':
