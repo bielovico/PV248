@@ -93,7 +93,7 @@ def get_pitches(window):
             break
         npeak, namp = peak_amps[1]
         i = 1
-        while namp == amp:
+        for _ in range(n):
             if npeak not in ps:
                 continue
             if abs(center-npeak) < abs(center-peak):
@@ -102,6 +102,8 @@ def get_pitches(window):
             if len(peak_amps) < i:
                 break
             npeak, namp = peak_amps[i]
+            if namp != amp:
+                break
         output.append(peak)
         peak_amps = [(peak, amps) for peak, amps in peak_amps if peak not in ps]
     pitches = []
@@ -114,7 +116,7 @@ def find_cluster(peak, peaks):
     center = peak
     found = True
     i = 0
-    while found:
+    for _ in range(len(peaks)):
         found = False
         i += 1
         if peak-i >= 0:
@@ -133,6 +135,8 @@ def find_cluster(peak, peaks):
             ps.append(peak+i)
             center += 0.5
             found = True
+        if not found:
+            break
     return ps, center
 
 def print_segment(start, end, pitches):
