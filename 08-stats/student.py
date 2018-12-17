@@ -6,7 +6,7 @@ import json
 filename = sys.argv[1]
 sid = sys.argv[2]
 
-semester_start = np.datetime64('2018-09-16')
+semester_start = np.datetime64('2018-09-17')
 
 def main():
     points = pd.read_csv(filename, index_col=0)
@@ -25,7 +25,7 @@ def main():
     days = np.array(cummulative.index) - semester_start
     days = days.astype('timedelta64[D]') / np.timedelta64(1, 'D')
     A = np.vstack([days, np.zeros(len(days))]).T
-    slope = np.linalg.lstsq(A, cummulative.values)[0][0]
+    slope = np.linalg.lstsq(A, cummulative.values, rcond=None)[0][0]
     student['regression slope'] = slope
     if slope == 0:
         print(json.dumps(student))

@@ -178,14 +178,14 @@ class TTTHandler(http.server.BaseHTTPRequestHandler):
         self.set_headers(len(output))
         self.wfile.write(output)
 
-def run(server_class=http.server.HTTPServer, handler_class=http.server.BaseHTTPRequestHandler):
+def run(port, server_class=http.server.HTTPServer, handler_class=http.server.BaseHTTPRequestHandler):
     server_address = ('', port)
     httpd = server_class(server_address, handler_class)
     httpd.serve_forever()
 
 def main():
     port = int(sys.argv[1])
-    run(server_class=TTTServer, handler_class=TTTHandler)
+    run(port, server_class=TTTServer, handler_class=TTTHandler)
 
 if __name__ == '__main__':
     main()
