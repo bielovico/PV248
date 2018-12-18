@@ -85,11 +85,15 @@ class TTTClient():
         if len(coords) != 2:
             return False
         try:
-            int(coords[0])
-            int(coords[1])
-            return True
+            x = int(coords[0])
+            y = int(coords[1])
         except ValueError:
             return False
+        if y<0 or x<0 or y>=self.current.board_size or x>=self.current.board_size:
+            return False
+        if self.current.board[y][x] != 0:
+            return False
+        return True     
 
     def resolve_move(self, board):
         changes = []
@@ -115,7 +119,8 @@ class TTTClient():
                 content = self.parse_request(move_req)
                 if content['status'] == 'bad':
                     print(content['message'])
-                    continue
+                    # print('invalid input')
+                    return
                 else:
                     self.current.play(self.player, x, y)
                     self.check_remote_status()
