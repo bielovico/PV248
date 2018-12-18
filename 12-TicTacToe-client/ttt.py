@@ -29,10 +29,12 @@ class TTTGame():
             return False
         if player != self.next:
             return False
-        if self.board[x][y] != 0:
+        if y<0 or x<0 or y>=self.board_size or x>=self.board_size:
             return False
-        self.board[x][y] = player
-        self.board_T[y][x] = player
+        if self.board[y][x] != 0:
+            return False
+        self.board_T[x][y] = player
+        self.board[y][x] = player
         self.moves +=1
         self.next = (player % 2) + 1
         self.check_board()
@@ -64,9 +66,9 @@ class TTTGame():
 
     def draw_board(self):
         for row in self.board:
-            print('|', end='')
+            # print('|', end='')
             for c in row:
-                print(self.player_characters[c] + '|', sep='', end='')
+                print(self.player_characters[c], sep='', end='')
             print()
 
 class TTTServer(http.server.HTTPServer):
@@ -165,6 +167,7 @@ class TTTHandler(http.server.BaseHTTPRequestHandler):
                 return
             if status['completed']:
                 output['winner'] = status['winner']
+                output['board'] = status['board']
             else:
                 output['board'] = status['board']
                 output['next'] = status['next']
