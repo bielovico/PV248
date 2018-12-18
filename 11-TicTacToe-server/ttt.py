@@ -8,8 +8,9 @@ import json
 import asyncio
 
 class TTTGame():
-    def __init__(self, id, board_size):
+    def __init__(self, id, board_size=3):
         self.id = id
+        self.board_size = board_size
         self.board = [[0 for _ in range(board_size)] for _ in range(board_size)]
         self.board_T = [[0 for _ in range(board_size)] for _ in range(board_size)]
         self.next = 1
@@ -28,10 +29,12 @@ class TTTGame():
             return False
         if player != self.next:
             return False
-        if self.board[x][y] != 0:
+        if y<0 or x<0 or y>=self.board_size or x>=self.board_size:
             return False
-        self.board[x][y] = player
-        self.board_T[y][x] = player
+        if self.board[y][x] != 0:
+            return False
+        self.board_T[x][y] = player
+        self.board[y][x] = player
         self.moves +=1
         self.next = (player % 2) + 1
         self.check_board()
