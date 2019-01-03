@@ -66,7 +66,7 @@ class ForwarderHandler(http.server.BaseHTTPRequestHandler):
             self.send_header('Content-Type', 'application/json')
             self.send_header('Content-Length', len(data))
             self.end_headers()
-            self.wfile.write()
+            self.wfile.write(data)
             return
         data = bytes(content, encoding='UTF-8')
         request = req.Request(url, headers=headers, method=typ, data=data)
