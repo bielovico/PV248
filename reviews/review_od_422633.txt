@@ -1,0 +1,169 @@
+review od 422633, *0.5, spätnná väzba bola vypracovaná podrobne a upravil som podľa nej relatívne dosť kódu.
+Vďaka review som dokázal lepšie nájsť nezrovnalosŤ pri výpočte peakov z clusterov v úlohe 7. 
+Dokázal som vďaka podnetom zjednodušiť niektoré funkcie na polovicu.
+Novinkou pre mňa bola aj set comprehension, ktorú som dovtedy nepoznal.
+-----------
+
+Úloha 6
+
+-----------
+
+
+
+peaks.py
+
+
+
+Program dává na výstup očekávané hodnoty. K funcionalitě nemám žádné připomínky. Zmínil bych drobností ke struktuře kódu.
+
+
+
+- Doporučil bych dodržovat konvenci jeden import na jeden řádek. Na prvním řádku kódu se importují dva různé moduly najednou.
+
+- Proměnná "window_seconds" mohla být deklarována ve skupině proměnných definující velikost okna.
+
+- Proměnná "stereo" obsahuje zbytečný test navíc. Stačí "stereo = nchannels == 2"
+
+- funkce get_window
+
+    - Proměnná "counter" mi přijde redundantní. Vypadá to, že se kontroluje počet prvků v okně, proto se mohla kontrolovat velikost seznamu window - len(window).
+
+    - Iterace pro stereo a mono je téměř identická, kód se z části opakuje.
+
+- podmínky na řádcích 53, 54
+
+    - Raději bych psal následující kód na samostatný řádek než na ten samý.
+
+
+
+----------
+
+Úloha 7
+
+----------
+
+
+
+music.py
+
+
+
+Kód je zde relativně přehledně rozdělen do jednotlivých funkcí, což ulehčuje sledování průbehu programu.
+
+
+
+- Podobně jako v úloze 6 v souboru peaks.py se zde nachází pár věcí, které se mohou zjednodušit.
+
+    - `stereo = True if nchannels == 2 else False` stačí jako `stereo = nchannels == 2`
+
+    - nevyužitý import floor z math
+
+    - v `c0 = standard_pitch*(2**(-9/12 - 4))` jde mocninu zjednodušit na -4.75
+
+    - stejná poznámka pro get_window jako pro úlohu 6
+
+- Největší potíže mám s funkcemi `get_pitches` a `find_cluster`. Principielně hledá potenciální cluster a jeho střed, resp. se hledá extrém nejbližší středu clusteru. Přestože jsem na výstup dostal stejné hodnoty (v toleranci několika centů) na několika souborech, nebyl jsem schopný odhalit konkrétní místo, kde se objevuje chyba, jak mi bylo sděleno. Protože nemám k dispozici testovací soubor, na kterém daná implementace neprošla, nejsem si tak jistý, co je špatně. Nicméně, po přečtení výstupu testu se jeví jako nekorektní právě implementace funkcí get_pitches nebo find_cluster. Nalezené tóny (frekvence) nespadají do povolené tolerance. I když zadání ve slajdech naznačuje, že extrém by měl být ve středu clusteru, v upřesňujícím příspěvku ve fóru https://is.muni.cz/auth/cd/1433/podzim2018/PV248/tyden_7_analyza_tonu se nabízí jednodušší varianta.
+
+- funkce get_pitches
+
+    - Moc mi není jasný důvod, proč je zde tato podmínka `if sum([abs(x) for x in window]) == 0:`. Pokud se žádné vhodné extrémy v daném okně nenacházejí, pak se vrací prázdný seznam. Proto bych tuto podmínku zcela odstranil.
+
+    - `if len(peak_amps) == 0:` lze psát i jako `if not peak_amps:`
+
+    - `if len(peak_amps) <= 1:` na předešlých řádcích se již testuje právě prázdnost seznamu, proto myslím, že test na velikost 1 je dostačující
+
+    - ```
+
+        i = 1
+
+        for _ in range(n):
+
+            if npeak not in ps:
+
+                continue
+
+            if abs(center-npeak) < abs(center-peak):
+
+                peak = npeak
+
+            i += 1
+
+            if len(peak_amps) < i:
+
+                break
+
+            npeak, namp = peak_amps[i]
+
+            if namp != amp:
+
+                break
+
+    ```
+
+        - Pokud npeak není v ps, pak se daná podmínka testuje n-krát. Myslím, že break by bylo vhodnější, protože npeak se nezmění.
+
+        - Pokud i + 1 == 2, potom se testuje velikost < 2, ta se však již testovala dříve.
+
+    - funkce find_cluster
+
+        - počáteční inicializace found = True je nadbytečná
+
+
+
+----------
+
+Úloha 8
+
+----------
+
+
+
+stat.py
+
+
+
+Program je přehledně rozdělený, bylo snadné se v něm zorientovat. K funkcionalitě nemám žádné připomínky.
+
+
+
+- Při vypisování JSONu na standardní výstup bych doporučil přidat parametr "indent" (případně i "sort_keys"), který daný výpis zpřehlední.
+
+- Ve funkci "entities" se nadbytečně vytváří seznam (list comprehension), ze kterého se následně výtváří množina. Konstruktor set() akceptuje iterovatelný objekt, proto lze využít generator comprehension, tj. lze vynechat hranaté závorky.
+
+    - současně: dates = set([d.split('/')[0] for d in dataframe])
+
+    - lze: dates = set(d.split('/')[0] for d in dataframe)
+
+
+
+student.py
+
+
+
+Zpracování vstupního csv souboru je relativně přehledné. Většina proměnných má smysluplné názvy, podle kterých je snadnější pochopit, jaké hodnoty obsahují. Některé proměnné jsou však jen jedno- nebo dvoupísmenné, které fungují především jako pomocné proměnné, avšak snižují čitelnost kódu.
+
+
+
+Také nepovažuji za nejlepší přepisování hodnot indexu proměnné "st". Raději bych zvolil vytvoření nové proměnné, která bude plnit daný účel. Na řádku s `st.index = np.array([i.split('/')[0] for i in st.index], dtype='datetime64')` tak dochází k chybě, která způsobí chybu ve výsledku lineární regrese. "st.index" obsahuje některá data vícekrát. To následně zanáší další chybu při výpočtu `cummulative = st.sort_index().cumsum()`, jejíž hodnoty jsou společně s "days" vstupem pro výpočet lineární regrese.
+
+
+
+Tedy pro opravu této chyby se musí zajistit, aby každé datum, resp. rozdíl dat, bylo reprezentováno pouze jednou.
+
+
+
+![](https://ipfs.infura.io/ipfs/QmeHXabfcq1wszhVAQYWYti2iRUx1XW7tu3gqPyVTFp1Bg/Code_2019-01-04_12-21-20.png)
+
+
+
+Podobně jako v stat.py si myslím, že pro výpis pro člověka je lepší přidat odsazení při vypisování JSONu.
+
+
+
+
+
+-------------------------
+
+
+
+Programy jsou většinou přehledné a snadno pochopitelné. Až na pár výjimek jsou proměnné pojmenovány účelově.
