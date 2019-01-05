@@ -80,30 +80,24 @@ def get_pitches(window):
     over_avg = amplitudes >= 20*np.average(amplitudes)
     peaks = np.where(over_avg)[0]
     amps = amplitudes[over_avg]
-    peak_amps = sorted(list(zip(peaks, amps)), key=lambda x: x[1], reverse=True)
+    peak_amps = sorted(list(zip(peaks, amps)), key=lambda x: x[1], reverse=True)  # sort by highest amplitude
     n = min(len(peaks), noutputs)
     output = []
     for _ in range(n):
         if len(peak_amps) == 0:
             break
+        if len(peak_amps) == 1:
+            output.append(peak_amps[0][0])
+            break
         peak, amp = peak_amps[0]
         ps, center = find_cluster(peak, over_avg)
-        if len(peak_amps) <= 1:
-            output.append(peak)
-            break
-        npeak, namp = peak_amps[1]
-        i = 1
-        for _ in range(n):
+        for npeak, namp in peak_amps[1:]:
             if npeak not in ps:
                 continue
-            if abs(center-npeak) < abs(center-peak):
-                peak = npeak
-            i += 1
-            if len(peak_amps) < i:
-                break
-            npeak, namp = peak_amps[i]
             if namp != amp:
                 break
+            if abs(center-npeak) < abs(center-peak):
+                peak = npeak
         output.append(peak)
         peak_amps = [(peak, amps) for peak, amps in peak_amps if peak not in ps]
     pitches = []
@@ -137,7 +131,7 @@ def find_cluster(peak, peaks):
             found = True
         if not found:
             break
-    return ps, center
+    return sorted(ps), center
 
 def print_segment(start, end, pitches):
     out = '{:03.1f}-{:03.1f}'.format(start, end)
