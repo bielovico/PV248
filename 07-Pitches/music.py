@@ -1,6 +1,6 @@
 import wave, struct
 import sys
-from math import log2, floor
+from math import log2
 import numpy as np
 
 window_seconds = 1  # in seconds
@@ -20,7 +20,7 @@ with wave.open(filename, mode='rb') as f:
     (nchannels, sample_width, framerate, nframes, _, _) = f.getparams()
     data = f.readframes(nframes)
 
-stereo = True if nchannels == 2 else False
+stereo = (nchannels == 2)
 window_frames = int(framerate * window_seconds)
 slide_frames = int(framerate * window_slide)
 nwindows = nframes // slide_frames
@@ -46,11 +46,10 @@ def closest_pitch(frequency):
     return pitch
 
 def get_window(data, stereo=False):
-    counter = 0
     window = []
     data_iterator = struct.iter_unpack('h', data)
-    if stereo:
-        for integer in data_iterator:
+    for integer in data_iterator:
+        if stereo:
             left = integer[0]
             try:
                 right = data_iterator.__next__()[0]
@@ -58,22 +57,14 @@ def get_window(data, stereo=False):
                 print('Stereo file has odd number of samples!', si)
                 break
             window.append((left + right) / 2)
-            counter += 1
-            if counter == window_frames:
-                yield window
-                window = window[slide_frames:]
-                counter -= slide_frames
-    else:
-        for integer in data_iterator:
+        else:
             window.append(integer[0])
-            counter += 1
-            if counter == window_frames:
-                yield window
-                window = window[slide_frames:]
-                counter -= slide_frames
+        if len(window) == window_frames:
+            yield window
+            window = window[slide_frames:]
 
 def get_pitches(window):
-    if sum([abs(x) for x in window]) == 0:
+    if sum([abs(x) for x in window]) == 0:  # if window is all 0, all frequencies are extremes but we don't want to analyze that
         return []
     amplitudes = np.fft.rfft(window)
     amplitudes = np.abs(amplitudes)
@@ -88,14 +79,14 @@ def get_pitches(window):
             break
         peak, amp = peak_amps[0]
         ps, center = find_cluster(peak, over_avg)
-        if len(peak_amps) <= 1:
+        if len(peak_amps) == 1:
             output.append(peak)
             break
         npeak, namp = peak_amps[1]
         i = 1
         for _ in range(n):
             if npeak not in ps:
-                continue
+                break
             if abs(center-npeak) < abs(center-peak):
                 peak = npeak
             i += 1
@@ -114,17 +105,16 @@ def get_pitches(window):
 def find_cluster(peak, peaks):
     ps = [peak]
     center = peak
-    found = True
     i = 0
     for _ in range(len(peaks)):
         found = False
         i += 1
         if peak-i >= 0:
-            left = peaks[peak-i]
+            left = (peaks[peak-i] == peaks[peak])
         else:
             left = False
         if peak+i < len(peaks):
-            right = peaks[peak+i]
+            right = (peaks[peak+i] == peaks[peak])
         else:
             right = False
         if left:
@@ -137,7 +127,7 @@ def find_cluster(peak, peaks):
             found = True
         if not found:
             break
-    return ps, center
+    return sorted(ps), center
 
 def print_segment(start, end, pitches):
     out = '{:03.1f}-{:03.1f}'.format(start, end)

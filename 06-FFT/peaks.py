@@ -1,8 +1,7 @@
-import wave, struct
+import wave
+import struct
 import sys
 import numpy as np
-
-window_seconds = 1  # in seconds
 
 filename = sys.argv[1]
 
@@ -10,16 +9,16 @@ with wave.open(filename, mode='rb') as f:
     (nchannels, sample_width, framerate, nframes, _, _) = f.getparams()
     data = f.readframes(nframes)
 
-stereo = True if nchannels == 2 else False
+stereo = (nchannels == 2)
+window_seconds = 1  # in seconds
 window_frames = int(framerate * window_seconds)
 nwindows = nframes // window_frames
 
 def get_window(data, stereo=False):
-    counter = 0
     window = []
     data_iterator = struct.iter_unpack('h', data)
-    if stereo:
-        for integer in data_iterator:
+    for integer in data_iterator:
+        if stereo:
             left = integer[0]
             try:
                 right = data_iterator.__next__()[0]
@@ -27,19 +26,11 @@ def get_window(data, stereo=False):
                 print('Stereo file has odd number of samples!', si)
                 break
             window.append((left + right) / 2)
-            counter += 1
-            if counter == window_frames:
-                yield window
-                window = []
-                counter = 0
-    else:
-        for integer in data_iterator:
+        else:
             window.append(integer[0])
-            counter += 1
-            if counter == window_frames:
-                yield window
-                window = []
-                counter = 0
+        if len(window) == window_frames:
+            yield window
+            window = []
 
 lowest = np.inf
 highest = -np.inf
