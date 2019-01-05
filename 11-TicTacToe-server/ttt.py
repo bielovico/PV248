@@ -5,7 +5,6 @@ port = int(sys.argv[1])
 import http.server
 from urllib.parse import urlparse, parse_qs
 import json
-import asyncio
 
 class TTTGame():
     def __init__(self, id, board_size=3):
