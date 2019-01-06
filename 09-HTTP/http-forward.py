@@ -25,7 +25,7 @@ class ForwarderHandler(http.server.BaseHTTPRequestHandler):
             output['json'] = j
         except ValueError:
             output['content'] = content
-        self.wfile.write(bytes(json.dumps(output), encoding='UTF-8'))
+        written = self.wfile.write(bytes(json.dumps(output), encoding='UTF-8'))
 
     def do_GET(self):
         print('GET request')

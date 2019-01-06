@@ -21,18 +21,18 @@ def main():
         entity['median'] = q[0.5]
         entity['passed'] = int(sum(e > 0))
         result[e.name] = entity.copy()
-    print(json.dumps(result))
+    print(json.dumps(result, indent=3, sort_keys=True))
 
 def entities(dataframe, mode):
     if mode == 'deadlines':
         for c in dataframe:
             yield dataframe[c]
     elif mode == 'dates':
-        dates = set([d.split('/')[0] for d in dataframe])
+        dates = set(d.split('/')[0] for d in dataframe)
         for d in dates:
             yield dataframe.filter(like=d).sum(axis=1).rename(d)
     elif mode == 'exercises':
-        exercises = set([d.split('/')[1] for d in dataframe])
+        exercises = set(d.split('/')[1] for d in dataframe)
         for e in exercises:
             yield dataframe.filter(like='/'+e).sum(axis=1).rename(e)
 

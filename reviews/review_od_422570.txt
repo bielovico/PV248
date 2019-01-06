@@ -1,0 +1,54 @@
+review od 422570, *0.5, review bola vypracovaná podrobne a vďaka nej som bol schopný nájsť chyby v úlohe 8.
+Poukázal na niektoré nedobré praktiky s pomenovávaním a zbytočne dlhými funkciami.
+Poukázal na použitie indent, o ktorom som dovtedy nevedel, vďaka tomu som našiel aj sort_keys.
+Review bola vykonaná naozaj expresne, takže som mohol reagovať v najbližšom termíne odovzdania.
+
+Uloha 8
+
+    stat.py
+        -Funkcionalita
+	    -Skript som otestoval a nenasiel som ziadne funkcne nedostatky, vystupne data vyzeraju byt korektne.
+        -Uprava kodu
+            -Pre lepsiu citatelnost by bolo lepsie vystupne data vhodnejsie formatovat. Napriklad pouzit parameter indent vo funkcii json.dumps().
+	    -okrem deadlines nie su vysledky zoradene vzostupne podla kluca. Kontrola vystupu je koli tomu zbytocne komplikovana.
+	    -Mimo toho je kod celkom dobre strukturovany a lahko sa cita.
+    student.py
+	-Funkcionalita
+	    -Skript pocita nespravne regression slope. Je to pravdepodobne z toho dovodu, ze datumy kde bolo viac deadlinov boli do vypoctu zahrnute viackrat.
+	    -Z toho dovodu, su nespravne vypocitane aj hodnoty date 16 a date 20. Tie ale v pripade spravneho regression slope davaju aj spravny vysledok (tesotvane na jednom priklade).
+	    -Ziadne dalsie funkcne nedostatky som pri testovani nenasiel, ostatne vystupne data vyzeraju byt korektne.
+        -Uprava kodu
+	    -Ohladom formatovania vystupu ma rovnaky nedostatok ako skript stat.py.
+	    -Bolo by lepsie rozdelit funkciu main() do viacerych mensich funkcii. Takto je kod tazko citatelny. 
+	    -Tak isto by bolo vhodne lepsie pomenovanie premennych, pretoze niektore nazvy nenapovedaju co sa v danych premennych nachadza.
+Uloha 11
+    ttt.py
+	-Funkcionalita
+	    -Oproti zadaniu su opacne nastavene suradnice pre ukladanie tahu hraca na hraciu dosku.
+	    -Mimo toho som nenasiel pri testovani ziadne nedostatky.
+	    -Ocenujem vratenie roznych chybovych kodov pre rozne druhy chybovych vstupov.
+	-Uprava kodu
+	    -V skripte sa nachadza nevyuzity import asyncio.
+	    -Pre lepsiu citatelnost by bolo vhodne aby boli importovane moduly na zaciatku kodu pokope a nebol medzi nimi ziadny iny kod.
+	    -Mimo toho sa kod dobre cita a to hlavne vdaka tomu, ze je rozdeleny do mensich funkcii, ktorych nazvy vypovedaju o ich ucele.
+
+Uloha 12
+    ttt.py
+	-Funkcionalita
+	    -K funkcionalite patria rovnake komentare ako v predoslej ulohe.
+	-Uprava kodu
+	    -Aj k uprave mam rovnake komentare ako v predoslej ulohe.
+    client.py
+	-Funkcionalita
+	    -Na zaciatku by mali byt vypisane idcka volnych hier vo formate "id meno". V tvojom pripade su ale vypisane vo formate "id:".
+	    -V zadani nebolo spomenute, ze vo vypise hracej dosky sa maju nachadzat znaky "|". Nemuseli by ti koli tomu prejst testy.
+	    -Ziadne dalsie nedostatky som k funkcionalite nenasiel.
+	-Uprava kodu
+	    -Bolo by vhodne pouzivat nazvy premennych, ktore odpovedaju ich ucelu. Kod je potom lahsie pochopitelny.
+	    -Mimo toho je vsak kod dobre strukturovany, dobre sa cita a lahko sa da pochopit.
+
+Zhrnutie
+    - Vsetky ulohy az na vypocet regression slope v student.py funguju korektne. 
+    - V niektorych situaciach maju odlisnosti oproti zadaniu ale to nemusi znamenat, ze pracuju nespravne.
+    - Co sa tyka upravy kodu, tak vo vacsine je dobre napisany, da sa pochopit. 
+    - Len v niektorych situaciach by bolo vhodne rozdelenie do mensich metod, lepsie pomenovanie premennych a lepsie formatovanie vystupu.
