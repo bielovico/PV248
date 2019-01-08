@@ -115,3 +115,4 @@ venv.bak/
 08-stats/points.csv
 09-HTTP/testing_server.py
 .vscode/settings.json
+07-Pitches/music.py.orig
