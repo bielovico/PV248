@@ -2,13 +2,19 @@ import sys
 import http.server
 import urllib.request as req
 from urllib.error import URLError
+from urllib.parse import urlparse
+import ssl
 import json
 
 class ForwarderHandler(http.server.BaseHTTPRequestHandler):
-    def write_forwarded(self, request, timeout=1):
+    def write_forwarded(self, request, timeout=1, https=False):
+        if https:
+            context = ssl.create_default_context()
+        else:
+            context = None
         try:
-            resp = req.urlopen(request, timeout=timeout)
-            code = resp.getcode()
+            resp = req.urlopen(request, timeout=timeout, context=context)
+            code = str(resp.getcode())
             headers = dict(resp.getheaders())
             content = resp.read().decode('UTF-8')
         except (http.server.socket.timeout, URLError):
@@ -25,7 +31,7 @@ class ForwarderHandler(http.server.BaseHTTPRequestHandler):
             output['json'] = j
         except ValueError:
             output['content'] = content
-        written = self.wfile.write(bytes(json.dumps(output), encoding='UTF-8'))
+        self.wfile.write(bytes(json.dumps(output), encoding='UTF-8'))
 
     def do_GET(self):
         print('GET request')
@@ -37,6 +43,7 @@ class ForwarderHandler(http.server.BaseHTTPRequestHandler):
         content_length = int(self.headers['Content-Length'])
         content = self.rfile.read(content_length).decode('utf-8')
         code = None
+        https = False
         try:
             params = json.loads(content)
         except ValueError:
@@ -48,6 +55,10 @@ class ForwarderHandler(http.server.BaseHTTPRequestHandler):
         url = params.get('url')
         if url is None:
             code = 'invalid json'
+        else:
+            o = urlparse(url)
+            if o.scheme == 'https':
+                https = True
         content = params.get('content')
         if content is None:
             if typ == 'POST':
@@ -70,7 +81,7 @@ class ForwarderHandler(http.server.BaseHTTPRequestHandler):
             return
         data = bytes(content, encoding='UTF-8')
         request = req.Request(url, headers=headers, method=typ, data=data)
-        self.write_forwarded(request, timeout)
+        self.write_forwarded(request, timeout, https)
 
 class ForwarderServer(http.server.HTTPServer):
     def set_upstream(self, upstream):
