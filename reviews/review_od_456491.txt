@@ -1,0 +1,48 @@
+review od 456491, *0.5, review od Jakuba bola vypracovaná podrobne a poukázala na veci, ktoré som si neuvodomoval, keďže som kód dobre poznal.
+Sám som sa s PEP8 zoznámil hlavne až pri vypracovávaní review pre ostatných ale som rád, že ho tiež Jakub spomína.
+Poukázal na veci, ktoré sú dôležité keď človek číta po druhom kód, ako mať main, v ktorej schovám hlavný kód a nemiešať skript a definície.
+Takisto prístup k jednopísmenným premenným mám iný ale po spätnom prejdení kódu tiež uznávam, že to môže byť peklo.
+
+
+Review pre: 409776
+Review od: Jakub Poláček 456491
+
+/*****************/
+/**** Uloha 6 ****/
+/*****************/
+
+- Podľa PEP 8 by mal názov classu alebo funkcie byť oddelený od kódu 2 prázdnymi riadkami pred / po definícii funkcie / classu. Funkcia get_window toto kritérium nespĺňa. Väčšina IDEčiek toto asi vie fixnúť, ale nevadí.
++ Šialene krátke riešenie. Čím chcem povedať, že som pomerne uchvátený efektívnosťou a presnosťou kódu. Fakt drsná práca.
+- Zabudnutý zakomentovaný print. Zneprehľadňuje kód, do budúcna takéto veci vhodné odstraňovať keď už nie sú potrebné. Ale to je detail.
++ Korektné použitie yield. To človek nevidí často. Veľmi pekné.
+- Jednoriadkové ify. Jo, asi to trochu šetrí miesto a v tomto prípade to nie je až tak neprehľadné. Ale celkovo je to trochu wtf a myslím že by bolo lepšie ich takto nepoužívať, minimálne nie v pythone kde človek proste čaká to odsadzovanie. Keď tak sa nad tým ešte zamysli do budúcna.
+- Neprítomnosť akejkoľvek main funkcie. Toto je ďaľšia vhodná vec, ktorá trochu sprehľadňuje kód, takto máš skript, ktorý niečo robí na začiatku, potom si náhodne uprostred definuje funkciu, ktorú potom zase zavolá, a celé to pôsobí hrozne rozhádzaným dojmom. Síce vďaka krátkosti riešenia sa to dá ešte v pohode sledovať, no v zložitejších programoch by to bol určite problém. Doporučujem sa pozrieť na celú vec okolo __main__ (aj keď pokiaľ vieš yield, tak asi aj toto).
+- Neprítomnosť definovania encodingu a environmentu. Nič kritické, ale občas to pomáha a umožňuje to volať kód priamo z command liny ako skript.
+
+/*****************/
+/**** Uloha 7 ****/
+/*****************/
+
+- Opäť to isté čo predtým, PEP 8 káže 2 riadky medzi definíciami funkcií, opäť neprítomnosť main funkcie a miešanie skriptu a definícíí funkcií.
+- Main nie je nutný ale aspoň nemiešaj skript a defínicie. Tzn. najskôr definuj všetky funkcie a potom píš skript alebo naopak. Takto je to fakt divné, polka skriptu na začiatku, polka na konci...
+- Funkcie by mohli byť definované v trochu lepšom poradí, aktuálne ich máš ako 1 2 4 3 v poradí volania v skripte zdola nahor.
+- Zbytočne ponechané zakomentované veci.
++ Inak v pohode, pekná dekompozícia do funkcií, ktoré sú obvykle správne krátke, pekné riešenie. Celkovo je to fajn.
+
+/*****************/
+/**** Uloha 8 ****/
+/*****************/
+
+stat.py
+
++ Dosť krásne, krátke riešenie. Ani som netušil že Pandas sa dá použiť takto jednoducho. Teda mám skôr pocit, že tu sa niečo učím ja než aby som to hodnotil tebe. 
++ Konečne prítomnosť main.
+- Zase problém s nedostatkom riadkov, ale to sa asi opakuje naprieč všetkými riešeniami.
++ Veľmi čisté, jednoduché, výstižné, fakt tomu neviem nič vytknúť. Možno by som dal funkciu entities nad main, pretože logicky main volá entities, ale to je len drobnosť.
+
+student.py
+
+- Hrozne nahustené, dlhé riadky, pôsobí to ako odstrašujúca masa textu ktorá sa ti nechce ani čítať. Možno by stálo zato to trochu viac dekomponovať do funkcií, alebo tam aspoň narvať nejaké prázdne riadky podľa logických celkov.
+- Názvy premenných ako "s" alebo "A" sa síce dajú z kódu vypozorovať, ale je to fakt blbé. Keď v kóde chceš niečo rýchlo nájsť, fakt nechceš zabiť minútu tým aby si zistil čo je preboha premenná "A". Prosím, nerob to. Ešte v tých lambda funkciách sa to dá prežiť, ale inak je to proste hrozné.
++ Inak v pohode.
+
