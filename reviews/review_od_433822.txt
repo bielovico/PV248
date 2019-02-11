@@ -1,0 +1,83 @@
+review od 433822, *0.5
+
+Úkol 2 Tridy
+
+================
+02. scorelib.py
+================
+
+U trid mas zbytecne deklarovane/inicializovane staticke promenne. Napriklad v tomto uryvku kodu:
+
+class Edition:
+    composition = None
+    authors = []
+    name = None
+    def __init__(self, composition, authors, name):
+        self.composition = composition
+        self.authors = authors
+        self.name = name
+
+Tady kazdou z tech promennych mas jednou jako statickou promennou tridy Edition, a pak jednou jako promennou instance tridy Edition.
+Krome toho, ze tohle zcela urcite neni to, ceho ses timto kodem snazil dosahnout, navic ani tak nedava smysl promenne nejak "dopredu"
+deklarovat a inicializovat. Init by mel nastavit vsechno co je potreba, pokud je nektery z parametru nepovinny, muzes nastavit
+jeho default hodnotu napriklad takto: def __init__(self, composition, authors = [], name = None):
+(V tomto pripade by composition byl povinny parametr a authors a name by byly nepovinny).
+
+Kdyz jdu dal v kodu, tak vidim, ze u nekterych funkci uz tyhle staticke promenne nemas a defaultni hodnoty parametru taky pouzivas,
+coz je zajimave - nenapada me duvod, proc bys to v pulce scriptu delal jednim zpusobem a potom druhym :D
+
+Metoda __str__ u tridy Voice by se dala zkratit na jeden radek:
+
+return ('' if self.date_range is None else self.date_range + ', ') + self.name
+
+Pokud se to zda byt spatne citelne, dalo by se to rozpadnout treba do dvou radku, kazdopadne by to slo kompaktneji a elegantneji.
+
+Metoda parse_print je trosku chaoticka a neni moc prehledna, nicmene vzhledem k tomu ze ukoly byly psany pouze za ucelem projiti testu s tim,
+ze pote uz nikdo nikdy s timto kodem nebude pracovat, tak se to da pochopit a nema smysl to moc komentovat.
+
+Úkol 3 SQL
+
+================
+03. import.py
+================
+
+Musim rict, ze jsi zvolil docela zajimavy pristup, ktery i po nekolika reviews vidim poprve.. 
+Nicmene si nemyslim, ze je tohle zpusob ktery by se mel pouzivat :D
+Proc si vytvaret "temp" tabulky a odkladat si do nich zaznamy, kdyz muzes veskery "pre-processing" delat
+v ramci pythonu (za pouziti python containeru - dict, list, set). Je zvykem snazit se minimalizovat pocet pristupu do DB,
+tohle je uplne opacny pristup- vytvaris si nove tabulky v databazi jen pro odlozeni pomocnych zaznamu, ktere pak hned zase mazes.
+Jinak pri vytvareni "temp" tabulek je zvykem pouzivat keyword TEMP/TEMPORARY, napr: CREATE TEMPORARY TABLE table_name,
+pripadne CREATE TEMPORARY TABLE table_name IF NOT EXISTS pokud nevime, zda tabulka uz neexistuje. V takovych pripadech
+by tu ale bylo asi lepsi nejdriv zavolat DROP TABLE IF EXISTS table_name a pak ji vytvorit. Nicmene vzhledem k tomu ze tu vzdy
+vytvarime DB "from scratch", tak vime, ze se o toto nemusime starat..
+
+Kazdopadne cenim originalitu a kreativitu :D
+
+Celkove je script dost zahusteny a v dusledku toho neni na prvni pohled uplne prehledny. Nicmene vzhledem k tomu, ze se jedna v podstate jen hromadu
+querin, ktery se jen vselijak naplnuji, tak se v tom orientovat vcelku da. :)
+
+Úkol 4 JSON
+
+================
+04. getprint.py
+================
+
+Velmi kratky scriptik, neni moc co komentovat. Snad jen ze by nebylo uplne od veci trosicku lepe zformatovat
+tu SQL querinu, aby se lepe cetla, napr. uryvek z meho kodu:
+
+	SELECT person.name, person.born, person.died
+	FROM print
+		JOIN edition ON print.edition = edition.id
+		JOIN score_author ON edition.score = score_author.score
+		JOIN person ON score_author.composer = person.id
+	WHERE print.id = ?
+
+
+================
+04. search.py
+================
+
+Klobouk dolu, takhle kompaktne napsanou jsem tuto ulohu jeste nevidel :D
+Opet bych asi ocenil nejake formatovani tech SQL querin, ale jinak to vypada dobre.
+Je videt ze ses s jazykem SQL nesetkal poprve :D
+
