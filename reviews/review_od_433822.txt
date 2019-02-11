@@ -1,4 +1,7 @@
-review od 433822, *0.5
+review od 433822, *0.5, autor komentuje okrem syntaktickıch záleitostí hlavne sémantické, èo sa vdy cení.
+Urèite je vhodná poznámka s prístupom do databáz, kedy sa spracovanie mohlo vytvára v rámci python štruktúr.
+Som rád, e autor rozumie, e niektoré veci boli robené ad-hoc bez hlbšieho zamyslenia nad krásou kódu.
+Všetko poctive v zmysle worse is better.
 
 Úkol 2 Tridy
 
