@@ -1,0 +1,69 @@
+review od 99030, *0.5, review bola zameraná na čitateľnosťou, v ktorej moje prvé kódy vôbec nevynikali
+veľmi oceňujem, že boli vypracované niekoľké testy na každú úlohu a teda, že sa tomu autor naozaj venoval
+na globálne premenné mám podobný názor už, pričom si stále myslím, že pre skripty, akými úlohy boli sú lgobálne premenné v poriadku
+určite je rozumné aj sa pozrieť na overovanie parametrov a vedieť sa tomu prispôsobiť. 
+
+
+##########################
+# Úloha: 01-stat.py      #
+##########################
+*Program správně identifikuje století i pro např. rok 1800 (poslední rok 
+ 18. století)
+*Líbí se mi ošetření nesprávné volby (2. argument programu) a vypsání chybové
+ zprávy.
+*Líbí se mi implementace tří voleb (povinná byla pouze volba composer a 
+ century, třetí volbou je volba key) 
+*Nicméně chybí kompletní ošetření vstupních argumentů programu. Program
+ vyžaduje dva argumenty. Prvním z nich je jméno souboru se vstupními daty a
+ druhým je volba. Pokud uživatel zadá méně než dva argumenty programu, bylo by
+ hezké ho zdvořile informovat a vypsat třeba nápovědu.
+*Program používá mnoho globálních proměnných. V tomto krátkém programu 
+ to nevadí, ale asi by stejně bylo lepší je umístět do příslušné funkce,
+ kde se s ní pracuje. Například proměnná re_composer se používá pouze ve
+ funkci parse_composer, nebo proměnná re_century zase jenom ve funkci
+ parse_century.
+
+Testování:
+*Pro volbu composer program vypisuje skladatele a počet skladeb - OK
+*Pro volbu century program vypisuje pro 18. století pouze 29 skladeb,
+ ale můj program mi vypisuje pro toto století 32 skladeb. Těžko říct,
+ jestli je to chyba, nebo ne.
+*Program funguje pro volbu key
+*Program je funkční
+
+##########################
+# Úloha: 05-eqn.py       #
+##########################
+*Program opět používá mnoho globálních proměnných.
+*V programu je mnoho kódu mimo funkce či třídy. Chybí nějaká hlavní funkce main.  
+*Líbí se mi použití třídy Solution, která zapouzdřuje data
+ (proměnné soustavy rovnic a řešení a umožňuje výpis řešení)
+*Zase není ověřeno, zda uživatel skutečně zadal jeden povinný argument
+ programu (jméno souboru se soustavou rovnic).
+*Parsování rovnice by bylo jednodušší s využitím regulárních výrazů.
+*Některé proměnné jsou pojmenované pouze jedním písmenem. Toto není dobrá praxe,
+ protože to značně zhoršuje čitelnost programu. 
+*Proměnné, funkce a některé úseky kódu by bylo dobré doplnit komentářem.
+
+Testování:
+*Program funguje pro jedno řešení, žádné řešení, i pro více než jedno řešení
+*Program funguje s extra mezerami
+*Program funguje pro různé pořadí proměnných
+*Program funguje korektně 
+
+##########################
+# Úloha: 06-peaks.py     #
+##########################
+*Proměnné (i jedna funkce) jsou tentokrát účelně pojmenované. Je to velký rozdíl
+ v porovnání s úlohou 05. Čitelnost je mnohem lepší.
+*Opět je mnoho kódu mimo funkce (je tu jenom jedna funkce). Mnohem lepší by bylo
+ schovat kód do funkce main a omezit tak viditelnost proměnných jenom na tuto funkci. 
+*Není ověřeno, zda uživatel skutečně zadal jeden povinný argument
+ programu (jméno vstupního souboru)
+*Některé logicky související úseky kódu by bylo dobré oddělit prázdným řádkem.
+*Líbí se mi použití metody min a max pro nalezení minima a maxima, nicméně použití
+ podmíněného příkazu if a následné přiřazení je tu poněkud zbytečné. Já bych rovnou
+ do těch proměnných to minimum a maximum přiřadil (bez použití if).
+
+Testování:
+*Program funguje korektně 
